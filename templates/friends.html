@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>need_title</title>
+        <style>body {padding: 10px;}</style>
+    </head>
+    <body>
+        {% extends "user_layout.html" %}
+        
+        {% block content %}
+            {% for friend in friend_list %}
+                <button type="button" oneclick="/chat?user_id={{user_id}}&friend_id={{friend['user_id']}}">{{friend["user_name"]}}のチャット</button>
+            {% endfor %}
+            
+            <form action="/friend_serch" method="post">
+            
+                <input type="hidden" name="friend_list" value="{{friend_list}}">
+                <input type="hidden" name="request_list" value="{{request_list}}">
+                <input type="hidden" name="user_name" value="{{user_name}}">
+                <input type="hidden" name="user_id" value="{{user_id}}">
+                
+                <input type="number" name="request_id" placeholder="フレンドのユーザーID">
+
+                <button type="submit">フレンドをさがす</button>
+        
+            </form>
+            
+            
+            
+            
+        {% endblock %}
+    </body>
+</html>

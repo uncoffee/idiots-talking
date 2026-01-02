@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>need_title</title>
+        <style>body {padding: 10px;}</style>
+    </head>
+    <body>
+        {% extends "user_layout.html" %}
+        
+        {% block content %}
+        
+            {% for chatlog in chatlogs %}
+                {% if chatlog["sender"] %}
+                    <p class="sender">{{chatlog["chatlog"]}}<br>{{chatlog[timelog]}}</p>
+                {% else %}
+                    <p class="recelver">{{chatlog["chatlog"]}}<br>{{chatlog["timelog"]}}</p>
+            {% endfor %}
+            
+        {% endblock %}
+    </body>
+</html>

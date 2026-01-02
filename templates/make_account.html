@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>Flask - paiza</title>
+        <style>
+        
+            body {
+                padding: 10px;
+            }
+                
+            h1 {
+                font-size: 20px;
+            }
+
+            .error {
+                    background-color: red;
+            }
+
+                
+        </style>
+        <meta name="google-signin-client_id" content="<用意したクライアントID>">
+    </head>
+    <body>
+        {% extends "layout.html" %}
+        
+        {% block content %}
+            <h1>新規作成</h1>
+            
+            <form action="/make_account" method="post">
+                {% if error == 1 %}
+                
+                    <div class="error">
+                        <label for="name">UserName</label>
+                        <input type="text" name="name"  placeholder="入力が11字以上です">
+                    </div>
+                    
+                {% elif error == 2 %}
+                    <div class="error">
+                        <label for="name">UserName</label>
+                        <input type="text" name="name"  placeholder="既に使用されている名前です">
+                    </div>
+                    
+                {%else%}
+                    <label for="name">UserName</label>
+                    <input type="text" name="name" placeholder="10字以内">
+                    
+                {% endif %}
+                
+                <label for="pass">Password</label>
+                <input type="number" name="pass" placeholder="半角数字で入力">
+                
+                <button type="submit">作成</button>
+                
+            </form>
+                
+            <button type="submit" onclick="location.href='/'">ログインはこちらから</button>
+            
+        {% endblock %}
+    </body>
+</html>
