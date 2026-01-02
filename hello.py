@@ -3,6 +3,12 @@ import uuid
 
 from flask import Flask, make_response , render_template,request , redirect, url_for
 
+#-------------------------------------------
+
+#メモ 
+#user_name = request.args.get("user_name")
+
+#-------------------------------------------
 
 
 app = Flask(__name__)
@@ -19,21 +25,64 @@ def getconnection():#データベースへ接続
 
     return connection
 
-@app.route("/friend" , methods = ["get"])
+@app.route("/friend" , methods = ["get"]) #フレンド一覧のurlがこれ。
 def result():
     #-----DBに接続します。------
     connection = getconnection()
     cursor = connection.cursor()
     #---------------------------
+    
+    user_data = check_uuid(cursor)
+
+    if user_data:
+        user_id = user_data["user_id"]
+        user_name = user_data ["user_name"]
+
+        friend_list , request_list = user_relations(cursor , user_id)
+
+        #-----接続を解除します------
+        cursor.close()
+        connection.close()
+        #---------------------------
+
+        return render_template("friends.html" , friend_list = friend_list , request_list = request_list , user_name = user_name , user_id = user_id)
+
+    else:
+        #-----接続を解除します------
+        cursor.close()
+        connection.close()
+        #---------------------------
+
+        return redirect("/", code=302)
+    
+@app.route("/chatroom" , methods = ["get"]) #フレンド一覧のurlがこれ。
+def result():
+
+
     user_id = request.args.get("user_id")
-    friend_list , request_list = user_relations(cursor , user_id)
+    friend_id = request.args.get("friend_id")
 
-    #-----接続を解除します------
-    cursor.close()
-    connection.close()
+    #-----DBに接続します。------
+    connection = getconnection()
+    cursor = connection.cursor()
     #---------------------------
+    
+    if not user_id == None AND not friend_id == None:
 
+        #-----接続を解除します------
+        cursor.close()
+        connection.close()
+        #---------------------------
 
+        return render_template("friends.html" , friend_list = friend_list , request_list = request_list , user_name = user_name , user_id = user_id)
+
+    else:
+        #-----接続を解除します------
+        cursor.close()
+        connection.close()
+        #---------------------------
+
+        return redirect("/", code=302)
     
     
 @app.route("/result" , methods = ["post"])
@@ -233,9 +282,12 @@ def user_relations(cursor , user_id):
         return (friend_list , request_list)
 
 
+def getinfo(cursor , user_id):#informatonからデータを取ってくる関数。
+    sql = "SELECT * FROM informations WHERE user_id = %(user_id)s"
+    cursor.execute(sql , {"user_id" : user_id})
+    user_data = cursor.fetchall()
 
-
-
+    return user_data
 
     
     
@@ -243,9 +295,6 @@ def user_relations(cursor , user_id):
 @app.route("/getchatlog" , methods = ["get"])
 def chatlog():
     print("getchatlog関数が叩かれたよ")
-
-    user_name = request.args.get("user_name")
-    friend_name = request.args.get("friend_name")
 
     user_id = request.args.get("user_id")
     friend_id = request.args.get("friend_id")
@@ -463,19 +512,6 @@ def getlink():
         
 @app.route("/")
 def hello_world():
-    #-----DBに接続します。------
-    connection = getconnection()
-    cursor = connection.cursor()
-    #---------------------------
-    user_data = check_uuid(cursor)
-
-    if user_data:
-
-    #-----接続を解除します------
-    connection.commit()
-    cursor.close()
-    connection.close()
-    #---------------------------
     return render_template("login.html")
 
 if __name__ == "__main__":
