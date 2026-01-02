@@ -1,39 +1,28 @@
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        <meta charset="utf-8">
-        <title>need_title</title>
-        <style>
+{% extends "user_layout.html" %}
+{% block title %}ちゃっとぺーじ{% endblock %}
+{% block css %}
+<style>
+    .sender {
+        color : blue;
+    }
 
-        body {padding: 10px;}
+    .recelver {
+        color : red;
+    }
 
-        .sender {
-            color : blue;
-        }
+    .timetext {
+        font-size : 5px;
+    }
+</style>
+{% endblock %}
+{% block content %}
 
-        .recelver {
-            color : red;
-        }
-
-        .timetext {
-            font-size : 5px;
-        }
-        
-        </style>
-    </head>
-    <body>
-        {% extends "user_layout.html" %}
-        
-        {% block content %}
-        
-            {% for chatlog in chatlogs %}
-                {% if chatlog["sender"] %}
-                    <p class="sender">{{user_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
-                {% else %}
-                    <p class="recelver">{{friend_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
-                {% endif %}
-            {% endfor %}
-            
-        {% endblock %}
-    </body>
-</html>
+    {% for chatlog in chatlogs %}
+        {% if chatlog["sender"] %}
+            <p class="sender">{{user_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
+        {% else %}
+            <p class="recelver">{{friend_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
+        {% endif %}
+    {% endfor %}
+    
+{% endblock %}

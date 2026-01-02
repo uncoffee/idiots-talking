@@ -55,6 +55,13 @@ PRIMARY KEY(user_id),
 FOREIGN KEY (user_id) REFERENCES informations(user_id)
 ) DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE uuids (
+uuid VARCHAR(36) NOT NULL,
+user_id INT NOT NULL,
+PRIMARY KEY(uuid),
+FOREIGN KEY (user_id) REFERENCES informations(user_id)
+) DEFAULT CHARSET=utf8mb4;
+
 
 
 テーブル消すとき↓↓

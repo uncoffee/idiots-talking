@@ -2,7 +2,7 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title>need_title</title>
+        <title>{% block title %}{% endblock %}</title>
         <style>
             body {
                 padding: 10px;
@@ -11,34 +11,17 @@
             .img {
                 width: auto;
             }
+            
         </style>
+        {% block css %}{% endblock %}
     </head>
     <body>
-        <h1>ようこそ&ensp;{{user_name}}&ensp;さん！</h1>
-        <p>どんな会話も円滑に</p>
-        {% if request_list %}
-        
-            {% for request in request_list %}
-            
-                <form action="/friend_judg" method="post">
-                    <h3>{{request["user_name"]}}</h3>
-                    <input type="hidden" name="user_id" value="{{user_id}}"/>
-                    <input type="hidden" name="request_id" value="{{request["user_id"]}}"/>
-                    
-                    <button type="submit" name="judg" value="TRUE">フレンドになる</button>
-                    <button type="submit" name="judg" value="FALSE">フレンドにならない</button>
-                </form>
-                
-            {% endfor %}
-        
+        {% if user_name %}
+            <h1>ようこそ&ensp;{{user_name}}&ensp;さん！</h1>
+            <p>どんな会話も円滑に</p>
         {% else %}
-        
-            <h2>フレンド申請は来ていないみたいです。</h2>
-            <img id="img" src="https://whiteningnet.com/oral-news/wp-content/uploads/2022/08/shutterstock_589312499.jpg"/>
-                
+            <h1><a herf="""">ログイン</a></h1>
         {% endif %}
-        
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </body>
 </html>

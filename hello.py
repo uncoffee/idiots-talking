@@ -1,6 +1,7 @@
 import pymysql  #pip は a.txt
+import uuid
 
-from flask import Flask , render_template,request , redirect, url_for
+from flask import Flask, make_response , render_template,request , redirect, url_for
 
 
 
@@ -17,7 +18,22 @@ def getconnection():#データベースへ接続
     )
 
     return connection
-    
+
+@app.route("/friend" , methods = ["get"])
+def result():
+    #-----DBに接続します。------
+    connection = getconnection()
+    cursor = connection.cursor()
+    #---------------------------
+    user_id = request.args.get("user_id")
+    friend_list , request_list = user_relations(cursor , user_id)
+
+    #-----接続を解除します------
+    cursor.close()
+    connection.close()
+    #---------------------------
+
+
     
     
 @app.route("/result" , methods = ["post"])
@@ -94,11 +110,12 @@ def login():
         print(f"\nuser_name:{user_name}")
         
         sql = "SELECT user_id FROM informations WHERE user_name = %s;"
-        cursor.execute(sql , user_name)
-        user_id = cursor.fetchall()
-        
-        if user_id: #auto_incrementが0から始まる場合は死ぬよ♡
-            user_id = user_id[0]["user_id"] #返り血から欲しい値を取り出す。
+        result = cursor.execute(sql , user_name)
+        user_id = cursor.fetchone()
+
+
+        if result == 1:
+            user_id = user_id["user_id"] #返り血から欲しい値を取り出す。
             print(f"\nuser_id:{user_id}") 
             
             sql = "SELECT user_id FROM passwords WHERE (user_id = %s) AND (password = %s);"
@@ -106,81 +123,119 @@ def login():
             check_account = cursor.fetchall()
             
             if check_account:#もし入力された値に該当するアカウントがあれば変数の中にuser_idが入る。なければ、0の値。
+    
+                
+                user_uuid = uuid.uuid4()
+                
+                print(f"uuid:{user_uuid} user_id{user_id}")
+
+                sql = "INSERT INTO uuids (uuid , user_id) VALUES (%(user_uuid)s , %(user_id)s)"
+                cursor.execute(sql, {"user_uuid" : user_uuid , "user_id" : user_id})
+
                 print(f"\n認証完了 id:{user_id} name:{user_name} pass:{user_pass}")
-                
-                sql = "SELECT friend_id FROM relations WHERE user_id = %s;"
-                cursor.execute(sql,user_id)
-                my_relation = cursor.fetchall()
-                
-                sql = "SELECT user_id FROM relations WHERE friend_id = %s;" 
-                cursor.execute(sql,user_id)
-                others_relation = cursor.fetchall()
-                
-                if others_relation: #そもそもフレンド申請が来ているかを確認する。
-                    print("\nお友達いるみたいです。よかったね")
-                    print(f"\nmy_relation:{my_relation}")
-                    print(f"\nothers_relation:{others_relation}")
-                    
-                    my_li = []
-                    oth_li = []
-                    
-                    request_list = []
-                    friend_list = []
-                    
-                    for i in my_relation:
-                        my_li.append(i["friend_id"])
-                        
-                    for i in others_relation:
-                        oth_li.append(i["user_id"])
-                        
-                    friend_list = set(oth_li) & set(my_li)
-                    request_list = set(oth_li) - set(my_li)
-                    
-                    print(f"\nfriend_list:{friend_list}")
-                    print(f"\nrequest_list:{request_list}")
-                    
-                    if friend_list:
-                        tuple(friend_list)
-                        print(friend_list)
-                        sql = "SELECT user_id , user_name FROM informations WHERE user_id in %s;" 
-                        cursor.execute(sql,friend_list)
-                        friend_list = cursor.fetchall()
-                    
-                    if request_list:
-                        tuple(request_list)
-                        print(request_list)
-                        sql = "SELECT user_id , user_name FROM informations WHERE user_id in %s;" 
-                        cursor.execute(sql,request_list)
-                        request_list = cursor.fetchall()
-                        
-                    print(f"\nmy_relation:{my_relation}")
-                    print(f"\nothers_relation:{others_relation}")
-                    print(f"\nrequest_list:{request_list}")
-                    print(f"\nfriend_list:{friend_list}")
-                    
-                    #-----接続を解除します------
-                    connection.commit()
-                    cursor.close()
-                    connection.close()
-                    #---------------------------
-                    
-                    return render_template("friends.html", user_name = user_name , user_id = user_id , friend_list = friend_list , request_list = request_list)
-                    
-                else:
-                    #一応求められてるから、変数を作成する。
-                    friend_list = []
-                    request_list = []
-                    
-                    print("\nフレンドもないし、申請もない。")
-                    return render_template("friends.html", user_name = user_name , user_id = user_id , friend_list = friend_list , request_list = request_list)
-                    
-            
+
+                friend_list , request_list = user_relations(cursor , user_id)
+
+                response = make_response(render_template("friends.html" , friend_list = friend_list , request_list = request_list , user_id = user_id , user_name = user_name ))
+                response.set_cookie("uuid", value="user_ssid", max_age=60)
+
+                return response
+
+            #-----接続を解除します------
+            connection.commit()
+            cursor.close()
+            connection.close()
+            #---------------------------
     
     cursor.close()
     connection.close()
     return redirect("/", code=302)
+
+
     
+def check_uuid(cursor): #openとcloseは別でやってね！！！！！
+    user_uuid = request.cookies.get("uuid")
+
+    sql = "SELECT user_id FROM uuids WHERE uuid = %(user_uuid)s"
+    result = cursor.execute(sql, {"user_uuid" : user_uuid})
     
+    if result == 1:
+        user_id = cursor.fetchone()
+        user_id = user_id["user_id"]
+
+        sql = "SELECT * FROM informations WHERE = %(user_id)s"
+        cursor.execute(sql, {"user_id" : user_id})
+
+        return result
+
+    else:
+        return False #とりまFalse
+
+def user_relations(cursor , user_id):
+    sql = "SELECT friend_id FROM relations WHERE user_id = %s;"
+    cursor.execute(sql , user_id)
+    my_relation = cursor.fetchall()
+    
+    sql = "SELECT user_id FROM relations WHERE friend_id = %s;" 
+    request_check = cursor.execute(sql , user_id)
+    others_relation = cursor.fetchall()
+    
+    if request_check > 0: #そもそもフレンド申請が来ているかを確認する。 ちなみに双方からフレンド申請している状態を、フレンド同士としている。
+        print("\nお友達いるみたいです。よかったね")
+        print(f"\nmy_relation:{my_relation}")
+        print(f"\nothers_relation:{others_relation}")
+        
+        my_li = []
+        oth_li = []
+        
+        request_list = []
+        friend_list = []
+        
+        for i in my_relation:
+            my_li.append(i["friend_id"])
+            
+        for i in others_relation:
+            oth_li.append(i["user_id"])
+            
+        friend_list = set(oth_li) & set(my_li)
+        request_list = set(oth_li) - set(my_li)
+        
+        print(f"\nfriend_list:{friend_list}")
+        print(f"\nrequest_list:{request_list}")
+        
+        if friend_list:
+            tuple(friend_list)
+            print(friend_list)
+            sql = "SELECT user_id , user_name FROM informations WHERE user_id in %s;" 
+            cursor.execute(sql,friend_list)
+            friend_list = cursor.fetchall()
+        
+        if request_list:
+            tuple(request_list)
+            print(request_list)
+            sql = "SELECT user_id , user_name FROM informations WHERE user_id in %s;" 
+            cursor.execute(sql,request_list)
+            request_list = cursor.fetchall()
+            
+        print(f"\nmy_relation:{my_relation}")
+        print(f"\nothers_relation:{others_relation}")
+        print(f"\nrequest_list:{request_list}")
+        print(f"\nfriend_list:{friend_list}")
+        
+        return friend_list , request_list
+
+    else:
+        #一応求められてるから、変数を作成する。
+        friend_list = []
+        request_list = []
+        
+        print("\nフレンドもないし、申請もない。")
+        return (friend_list , request_list)
+
+
+
+
+
 
     
     
@@ -245,7 +300,7 @@ def chatlog():
     return render_template("chatroom.html", chatlogs = chatlogs , user_name = user_name , user_id = user_id, friend_name = friend_name , friend_id = friend_id)
         
         
-@app.route("/friend_serch" , methods = ["post"])
+@app.route("/friend_request" , methods = ["post"])
 def friend_request():
     
     print("フレンド申請関数が叩かれたよ。")
@@ -272,7 +327,7 @@ def friend_request():
     #戻り値が「0」であれば関係がない。「typeがlist型」であれば、フレンド申請済みもしくは、フレンド登録済み。
     if result == 0:
         sql = "INSERT INTO relations (user_id , friend_id) VALUES (%s , %s);"
-        result = cursor.execute(sql , (user_id , request_id))
+        cursor.execute(sql , (user_id , request_id))
         
         print(f"申請完了 相手のID:{request_id}")
             
@@ -408,6 +463,19 @@ def getlink():
         
 @app.route("/")
 def hello_world():
+    #-----DBに接続します。------
+    connection = getconnection()
+    cursor = connection.cursor()
+    #---------------------------
+    user_data = check_uuid(cursor)
+
+    if user_data:
+
+    #-----接続を解除します------
+    connection.commit()
+    cursor.close()
+    connection.close()
+    #---------------------------
     return render_template("login.html")
 
 if __name__ == "__main__":
