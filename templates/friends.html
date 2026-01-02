@@ -10,7 +10,18 @@
         
         {% block content %}
             {% for friend in friend_list %}
-                <button type="button" oneclick="/chat?user_id={{user_id}}&friend_id={{friend['user_id']}}">{{friend["user_name"]}}のチャット</button>
+
+            <form action="/getchatlog" method="get">
+
+                <input type="hidden" name="user_name" value="{{user_name}}">
+                <input type="hidden" name="friend_name" value="{{friend['user_name']}}">
+                <input type="hidden" name="user_id" value="{{user_id}}">
+                <input type="hidden" name="friend_id" value="{{friend['user_id']}}">
+                
+                <button type="submit">{{friend["user_name"]}}のチャット</button>
+
+            </form>
+                
             {% endfor %}
             
             <form action="/friend_serch" method="post">

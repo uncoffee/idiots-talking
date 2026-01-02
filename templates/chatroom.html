@@ -3,7 +3,23 @@
     <head>
         <meta charset="utf-8">
         <title>need_title</title>
-        <style>body {padding: 10px;}</style>
+        <style>
+
+        body {padding: 10px;}
+
+        .sender {
+            color : blue;
+        }
+
+        .recelver {
+            color : red;
+        }
+
+        .timetext {
+            font-size : 5px;
+        }
+        
+        </style>
     </head>
     <body>
         {% extends "user_layout.html" %}
@@ -12,9 +28,10 @@
         
             {% for chatlog in chatlogs %}
                 {% if chatlog["sender"] %}
-                    <p class="sender">{{chatlog["chatlog"]}}<br>{{chatlog[timelog]}}</p>
+                    <p class="sender">{{user_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
                 {% else %}
-                    <p class="recelver">{{chatlog["chatlog"]}}<br>{{chatlog["timelog"]}}</p>
+                    <p class="recelver">{{friend_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
+                {% endif %}
             {% endfor %}
             
         {% endblock %}

@@ -9,7 +9,7 @@ app = Flask(__name__)
 def getconnection():#データベースへ接続
     connection = pymysql.connect(
     host="localhost", #わからん
-    db="mydb", #使ってるデータベースの名前
+    db="myapp", #使ってるデータベースの名前
     user="root", #わからん
     password="", #パスワードは無し
     charset="utf8", #文字コード指定
@@ -187,10 +187,20 @@ def login():
 #開発中。    
 @app.route("/getchatlog" , methods = ["get"])
 def chatlog():
-    user_id = request.form["user_id"]
-    friend_id = request.form["friend_id"]
+    print("getchatlog関数が叩かれたよ")
+
+    user_name = request.args.get("user_name")
+    friend_name = request.args.get("friend_name")
+
+    user_id = request.args.get("user_id")
+    friend_id = request.args.get("friend_id")
+
+    user_id = int(user_id)
+    friend_id = int(friend_id)
+
+    print(f"\nuser_id:{user_id} friend_id:{friend_id}")
     
-    #-----DBに接続します。------
+    #-----DBに接続します。-------
     connection = getconnection()
     cursor = connection.cursor()
     #---------------------------
@@ -199,12 +209,15 @@ def chatlog():
     
     cursor.execute(sql , {"user_id":user_id , "friend_id":friend_id})
     send_logs = cursor.fetchall()
-    
+
+    print(f"\nsend_log:{send_logs}")
     
     sql = "SELECT log_id , timelog , chatlog FROM chatlogs WHERE sender_id = %(friend_id)s AND recelver_id = %(user_id)s;"
     
     cursor.execute(sql , {"user_id":user_id , "friend_id":friend_id})
     recelver_logs = cursor.fetchall()
+
+    print(f"\nrecelver_log:{recelver_logs}")
     
     chatlogs = []
     
@@ -215,17 +228,21 @@ def chatlog():
     for recelver in recelver_logs:
         recelver["sender"] = False
         chatlogs.append(recelver)
+
+    print(f"\nchatlogs:{chatlogs}")
         
-    chatlogs = sorted(chatlog ,key=lambda logdata: logdata["log_id"])
+    chatlogs = sorted(chatlogs ,key=lambda logdata: logdata["log_id"])
     
     #-----接続を解除します------
     connection.commit()
     cursor.close()
     connection.close()
     #---------------------------
+
+    print(f"\n送信準備ok! chatlogs:{chatlogs} user_id:{user_id} user_name:{user_name} friend_id:{friend_id} friend_name:{friend_name}")
     
     #chatlogsには{"sender_id":"???","recelver_id":"???","timelog":"????y??m??d","chatlog":"?????????","sender":"True OR False"}　が入っている
-    return render_template("chatroom.html", chatlogs = chatlogs , user_name = user_name , friend_name = friend_name)
+    return render_template("chatroom.html", chatlogs = chatlogs , user_name = user_name , user_id = user_id, friend_name = friend_name , friend_id = friend_id)
         
         
 @app.route("/friend_serch" , methods = ["post"])
