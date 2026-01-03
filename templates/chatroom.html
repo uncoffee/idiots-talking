@@ -1,5 +1,7 @@
-{% extends "user_layout.html" %}
-{% block title %}ちゃっとぺーじ{% endblock %}
+{% extends "layout.html" %}
+
+{% block title %}{{% friend_data["user_name"] %}}とのチャット{% endblock %}
+
 {% block css %}
 <style>
     .sender {
@@ -15,14 +17,25 @@
     }
 </style>
 {% endblock %}
+
 {% block content %}
 
     {% for chatlog in chatlogs %}
-        {% if chatlog["sender"] %}
-            <p class="sender">{{user_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
+        {% if chatlog["sender_id"] == user_data["user_id"] %}
+            <p class="sender">{{user_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
         {% else %}
-            <p class="recelver">{{friend_name}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
+            <p class="recelver">{{friend_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
         {% endif %}
     {% endfor %}
+
+    <form action="/chatroom" method="post">
+        <input type="hidden" name="recelver_id" value="{{friend_data["friend_id"]}}">
+        {% if error = 1 %}
+            <input type="text" name="text" placeholder="250字以内でお願いします">
+        {% else %}
+            <input type="text" name="text" placeholder="相手に送るテキスト">
+        {% endif %}
+        <button type="submit">送信</button>
+    </form>
     
 {% endblock %}

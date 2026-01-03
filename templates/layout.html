@@ -2,13 +2,38 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title>need_title</title>
-        <style>body {padding: 10px;}</style>
+        <title>{% block title %}{% endblock %}</title>
+        <style>
+            body {
+                padding: 10px;
+                
+            }
+
+            .video {
+                width: auto;
+            }
+
+            img {
+                width: auto;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            
+        </style>
+        {% block css %}{% endblock %}
     </head>
     <body>
-        <video src="https://www.pexels.com/ja-jp/download/video/5743314/"　controls autoplay muted playsinline preload poster="thumbnail.jpg" width="250"></video>
-        <p>どんな会話もわかりやすい形に</p>
-        {% block content %}
-        {% endblock %}
+        <video src="https://www.pexels.com/ja-jp/download/video/5743314/" class="video" controls autoplay muted playsinline preload poster="thumbnail.jpg" width="250"></video>
+        {% if user_name %}
+            <h1>ようこそ&ensp;{{user_data["user_name"]}}&ensp;さん！</h1>
+            <h2>{% block title %}{% endblock %}</h2>
+        {% else %}
+            <h1>{% block title %}{% endblock %}</h1>
+        {% endif %}
+            <p>どんな会話もわかりやすい形に</p>
+        {% block content %}{% endblock %}
     </body>
 </html>

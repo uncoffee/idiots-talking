@@ -1,43 +1,29 @@
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        <meta charset="utf-8">
-        <title>Flask - paiza</title>
-        <style>
+{% extends "layout.html" %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block css %}
+<style>
+
+</style>
+{% endblock %}
+
+{% extends "layout.html" %}
+
+{% block content %}
+    
+    <form action="/login" method="post">
         
-            body {
-                padding: 10px;
-                }
-                
-            h1 {
-                font-size: 20px;
-            }
-                
-        </style>
-        <script src="https://apis.google.com/js/platform.js" async defer>
-            
-        </script>
-        <meta name="google-signin-client_id" content="<用意したクライアントID>">
-    </head>
-    <body>
-        {% extends "layout.html" %}
+        <label for="name">Name</label>
+        <input type="text" name="user_name">
+        <label for="pass">Password</label>
+        <input type="number" name="user_pass">
+        <button type="submit">ログイン</button>
         
-        {% block content %}
-            
-            <h1>ログインページ</h1>
-            
-            <form action="/login" method="post">
-                
-                <label for="name">UserName</label>
-                <input type="text" name="user_name">
-                <label for="pass">UserPassword</label>
-                <input type="number" name="user_pass">
-                <button type="submit">ログイン</button>
-                
-            </form>
-                
-            <button onclick="location.href='/make_account_html'">アカウントの新規作成</button>
-            
-        {% endblock %}
-    </body>
-</html>
+    </form>
+    
+    <form action="/make_account">
+        <button type="submit">アカウントの新規作成</button>
+    </form>
+    
+{% endblock %}

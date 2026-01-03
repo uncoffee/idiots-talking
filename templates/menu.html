@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block title %}メニュー{% endblock %}
+
+{% block css%}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    {% if request_list %}
+
+        {% for request in request_list %}
+
+            <form action="/friend_judg" method="post">
+                <h3>{{request["user_name"]}}</h3>
+                <input type="hidden" name="user_id" value="{{friend['user_id']}}"/>
+                <input type="hidden" name="request_id" value="{{request["user_id"]}}"/>
+                
+                <button type="submit" name="judg" value="TRUE">フレンドになる</button>
+                <button type="submit" name="judg" value="FALSE">フレンドにならない</button>
+            </form>
+            
+        {% endfor %}
+
+    {% else %}
+
+        <h2>フレンド申請は来ていないみたいです。</h2>
+        <img id="img" src="https://whiteningnet.com/oral-news/wp-content/uploads/2022/08/shutterstock_589312499.jpg"/>
+        
+    {% endif %}
+
+    {% for friend in friend_list %}
+
+        <form action="/chatroom" method="get">
+
+            <input type="hidden" name="user_name" value="{{user_data["user_name"]}}">
+            <input type="hidden" name="friend_name" value="{{friend['user_name']}}">
+            <input type="hidden" name="user_id" value="{{user_data["user_id"]}}">
+            <input type="hidden" name="friend_id" value="{{friend['user_id']}}">
+            
+            <button type="submit">{{friend["user_name"]}}のチャット</button>
+
+        </form>
+        
+    {% endfor %}
+
+    <form action="/friend_request" method="post">
+
+        <input type="hidden" name="friend_list" value="{{friend_list}}">
+        <input type="hidden" name="request_list" value="{{request_list}}">
+        <input type="hidden" name="user_name" value="{{user_data["user_name"]}}">
+        <input type="hidden" name="user_id" value="{{user_data["user_id"]}}">
+        {% if error == 2 %}
+            <input type="number" name="request_id" placeholder="送信済みもしくは既にフレンドになっています">
+        {% else %}
+            <input type="number" name="request_id" placeholder="フレンドのユーザーID">
+        {% endif%}
+        <button type="submit">フレンドをさがす</button>
+
+    </form>
+
+{% endblock %}
