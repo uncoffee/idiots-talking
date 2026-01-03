@@ -14,7 +14,6 @@ from flask import Flask, make_response , render_template,request , redirect, url
 
 #-------------------------------------------
 
-
 app = Flask(__name__)
 
 #一番最初のログインページに飛ばす。

@@ -25,17 +25,15 @@ from flask import Flask, make_response , render_template,request , redirect, url
 
 def use_db(func):
     def wakaran(*args , **keyword):
-
         connection = pymysql.connect(
         host="localhost", #わからん
-        db=dbname, #使ってるデータベースの名前
+        db="myapp", #使ってるデータベースの名前
         user="root", #わからん
         password="", #パスワードは無し
         charset="utf8", #文字コード指定
         cursorclass=pymysql.cursors.DictCursor #dict型(辞書型)に型を変更している　これによってhtml上でのデータの取り出しが楽になる。らしい
         )
 
-        connection
         cursor = connection.cursor()
 
         yokuwakaran = func(cursor , *args , **keyword)

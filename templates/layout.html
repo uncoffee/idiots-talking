@@ -29,9 +29,10 @@
         <video src="https://www.pexels.com/ja-jp/download/video/5743314/" class="video" controls autoplay muted playsinline preload poster="thumbnail.jpg" width="250"></video>
         {% if user_name %}
             <h1>ようこそ&ensp;{{user_data["user_name"]}}&ensp;さん！</h1>
-            <h2>{% block title %}{% endblock %}</h2>
+            <!-- 初めてエラーを自分で解決できたクソ嬉しい-->
+            <h2>{{ self.title() }}</h2>
         {% else %}
-            <h1>{% block title %}{% endblock %}</h1>
+            <h1>{{ self.title() }}</h1>
         {% endif %}
             <p>どんな会話もわかりやすい形に</p>
         {% block content %}{% endblock %}
