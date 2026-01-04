@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}{{% friend_data["user_name"] %}}とのチャット{% endblock %}
+{% block title %}{{ friend_data["user_name"] }}とのチャット{% endblock %}
 
 {% block css %}
 <style>
@@ -13,7 +13,7 @@
     }
 
     .timetext {
-        font-size : 5px;
+        font-size : 20px;
     }
 </style>
 {% endblock %}
@@ -29,8 +29,8 @@
     {% endfor %}
 
     <form action="/chatroom" method="post">
-        <input type="hidden" name="recelver_id" value="{{friend_data["friend_id"]}}">
-        {% if error = 1 %}
+        <input type="hidden" name="recelver_id" value="{{friend_data["user_id"]}}">
+        {% if error == 1 %}
             <input type="text" name="text" placeholder="250字以内でお願いします">
         {% else %}
             <input type="text" name="text" placeholder="相手に送るテキスト">

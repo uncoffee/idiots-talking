@@ -31,9 +31,20 @@
 
 # # print(a)
 
-def a(*args):
-    print(*args)
-    for i in args:
-        print(i)
+# def a():
+#     b()
 
-a("a" , "b" , "c")
+# def b():
+#     c()
+
+# def c():
+#     d()
+
+# def d():
+#     e()
+
+# def e():
+#     print(sdfadfadda)
+#     print("aaaa")
+
+# a()

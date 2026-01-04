@@ -16,7 +16,6 @@
 
             <form action="/friend_judg" method="post">
                 <h3>{{request["user_name"]}}</h3>
-                <input type="hidden" name="user_id" value="{{friend['user_id']}}"/>
                 <input type="hidden" name="request_id" value="{{request["user_id"]}}"/>
                 
                 <button type="submit" name="judg" value="TRUE">フレンドになる</button>
@@ -36,9 +35,6 @@
 
         <form action="/chatroom" method="get">
 
-            <input type="hidden" name="user_name" value="{{user_data["user_name"]}}">
-            <input type="hidden" name="friend_name" value="{{friend['user_name']}}">
-            <input type="hidden" name="user_id" value="{{user_data["user_id"]}}">
             <input type="hidden" name="friend_id" value="{{friend['user_id']}}">
             
             <button type="submit">{{friend["user_name"]}}のチャット</button>

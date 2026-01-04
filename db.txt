@@ -40,8 +40,8 @@ CREATE TABLE chatlogs (
 log_id INT NOT NULL auto_increment,
 sender_id INT NOT NULL,
 recelver_id INT NOT NULL,
-timelog VARCHAR(11),
-chatlog VARCHAR(250),
+timelog DATETIME NOT NULL,
+chatlog VARCHAR(250) NOT NULL,
 PRIMARY KEY(log_id),
 FOREIGN KEY (sender_id) REFERENCES informations(user_id),
 FOREIGN KEY (recelver_id) REFERENCES informations(user_id)

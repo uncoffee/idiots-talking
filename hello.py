@@ -47,13 +47,11 @@ def chatroom(cursor , user_data , error = 0):
     if check_none(user_id , user_name):
         return redirect("/chatroom" , code=302)
 
-
-
     print(f"\nuser_id:{user_id} friend_id:{friend_id}")
 
     friend_data = getinfo(cursor , friend_id)
 
-    sql = """SELECT log_id , timelog , chatlog 
+    sql = """SELECT sender_id , log_id , timelog , chatlog 
     FROM chatlogs 
     WHERE (sender_id = %(user_id)s AND recelver_id = %(friend_id)s) 
     OR (sender_id = %(friend_id)s AND recelver_id = %(user_id)s) 
@@ -62,13 +60,13 @@ def chatroom(cursor , user_data , error = 0):
     cursor.execute(sql , {"user_id":user_id , "friend_id":friend_id})
     chatlogs = cursor.fetchall()
 
-    print(f"\n送信準備ok! chatlogs:{chatlogs} user_id:{user_id} user_name:{user_name} friend_id:{friend_id} friend_name:{friend_name}")
+    print(f"\n送信準備ok! chatlogs:{chatlogs} user_data:{user_data} friend_data:{friend_data}")
     
     #chatlogsには{"sender_id":"???","recelver_id":"???","timelog":"????y??m??d","chatlog":"?????????","sender":"True OR False"}　が入っている
     return render_template("chatroom.html", error = error, chatlogs = chatlogs , user_data = user_data , friend_data = friend_data , UTC = -9)
 
 @app.route("/make_account" , methods = ["get"])
-def chatroom_get(error = 0):
+def make_account(error = 0):
     return render_template("make_account.html" , error = error) 
 
 
@@ -82,27 +80,29 @@ def chatroom_post(cursor , user_data):
 
     sender_id = user_data["user_id"]
 
-    recelver_id = request.form.get["recelver_id"]
-    text = request.form.get["text"]
+    recelver_id = request.form.get("recelver_id")
+    text = request.form.get("text")
 
-    if check_none(recelver_id , text):
+    print(f"recelver_id:{recelver_id} text:{text}")
+
+    if check_none(recelver_id,text):
         return redirect("/menu" , code=302)
 
     if len(text) >= 250:
         return chatroom(cursor , user_data , error = 1)
     
-    sql = "INSERT INTO chatlogs (sender_id , recelver_id , timelog , chatlog) VALUES (%(sender_id)s, %(recelver_id)s, NOW(), %(text)s"
+    sql = "INSERT INTO chatlogs (sender_id , recelver_id , timelog , chatlog) VALUES (%(sender_id)s, %(recelver_id)s, NOW(), %(text)s);"
     cursor.execute(sql , {"sender_id" : sender_id , "recelver_id" : recelver_id , "text" : text})
 
-    return redirect("/chatroom" , code=302)
+    return redirect(f"/chatroom?friend_id={recelver_id}" , code=302)
 
 @app.route("/login" , methods = ["post"])
 @use_db
-def login(cursor , user_data):
+def login(cursor):
     
     print("ログイン関数がたたかれたよ")
-    user_name = request.form.get["user_name"]
-    user_pass = request.form.get["user_pass"]
+    user_name = request.form.get("user_name")
+    user_pass = request.form.get("user_pass")
 
     if check_none(user_name , user_pass):
         return redirect("/" , code=302)
@@ -122,13 +122,16 @@ def login(cursor , user_data):
         cursor.execute(sql , {"user_id" : user_id , "user_pass" : user_pass})
         check_account = cursor.fetchone()
 
-        if check_account == user_id:
+        print(check_account["user_id"] , user_id)
+        print(type(check_account["user_id"]) , type(user_id))
+
+        if check_account["user_id"] == user_id:
             print("認証が成功")
 
-            user_uuid = uuid.uuid4()
+            user_uuid = uuid.uuid4().hex
 
             print(f"uuid:{user_uuid} user_id{user_id}")
-            sql = "INSERT INTO uuids (uuid , user_id) VALUES (%(user_uuid)s , %(user_id)s)"
+            sql = "INSERT INTO uuids (uuid , user_id) VALUES (%(user_uuid)s , %(user_id)s);"
             cursor.execute(sql, {"user_uuid" : user_uuid , "user_id" : user_id})
 
             print(f"\n認証完了 id:{user_id} name:{user_name} pass:{user_pass}")
@@ -136,6 +139,8 @@ def login(cursor , user_data):
 
             response = make_response(render_template("menu.html" , friend_list = friend_list , request_list = request_list , user_data = user_data))
             response.set_cookie("uuid", value=user_uuid, max_age=60)
+
+            return response
 
     return redirect("/", code=302)
         
@@ -147,7 +152,7 @@ def friend_request(cursor , user_data):
 
     user_id = user_data["user_id"]
 
-    request_id = request.form.get["request_id"]
+    request_id = request.form.get("request_id")
 
     if check_none(request_id):
         return redirect("/menu" , code=302)
@@ -175,8 +180,8 @@ def friend_judg(cursor , user_data):
     
     user_id = user_data["user_id"]
 
-    request_id = request.form.get["request_id"]
-    judg = request.form.get["judg"]
+    request_id = request.form.get("request_id")
+    judg = request.form.get("judg")
 
     if check_none(request_id , judg):
         return redirect("/menu" , code=302)
@@ -210,7 +215,7 @@ def friend_judg(cursor , user_data):
     
 @app.route("/make_account" , methods = ["post"])
 @use_db
-def make_account(cursor):
+def make_account_post(cursor):
     print("make_account関数がたたかれたよ！")
     new_name = request.form["name"]
     new_pass = int(request.form["pass"])
@@ -225,9 +230,9 @@ def make_account(cursor):
     
     user_data = getinfo(cursor , None , new_name)
 
-    if user_data == None: 
+    if not user_data == None: 
         print("\n同じ名前のユーザーがいます。")
-        return make_account(error = 1)
+        return make_account(error = 2)
     
     print("\n入力されたデータにもんだいはなかったよん")
         

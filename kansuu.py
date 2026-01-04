@@ -52,14 +52,14 @@ def check_uuid(func):
     def wakaran(cursor , *args , **keyword):
         user_uuid = request.cookies.get("uuid")
 
-        sql = "SELECT user_id FROM uuids WHERE uuid = %(user_uuid)s"
+        sql = "SELECT user_id FROM uuids WHERE uuid = %(user_uuid)s;"
         result = cursor.execute(sql, {"user_uuid" : user_uuid})
         
         if result == 1:
             user_id = cursor.fetchone()
             user_id = user_id["user_id"]
 
-            sql = "SELECT * FROM informations WHERE = %(user_id)s"
+            sql = "SELECT * FROM informations WHERE user_id = %(user_id)s;"
             cursor.execute(sql, {"user_id" : user_id})
             user_data = cursor.fetchone()
 
