@@ -4,38 +4,48 @@
 
 {% block css %}
 <style>
-    .sender {
+    #sender {
         color : blue;
     }
 
-    .recelver {
+    #recelver {
         color : red;
     }
 
-    .timetext {
+    #timetext {
         font-size : 20px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<div id="out_frame">
+    <h2></h2>
+    <div id="text_box">
+        {% for chatlog in chatlogs %}
+            {% if chatlog["sender_id"] == user_data["user_id"] %}
+                <p id="sender">{{user_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span id="timetext">{{chatlog[timelog]}}</span></p>
+            {% else %}
+                <p id="recelver">{{friend_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span id="timetext">{{chatlog["timelog"]}}</span></p>
+            {% endif %}
+        {% endfor %}
+    </div>
 
-    {% for chatlog in chatlogs %}
-        {% if chatlog["sender_id"] == user_data["user_id"] %}
-            <p class="sender">{{user_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog[timelog]}}</span></p>
-        {% else %}
-            <p class="recelver">{{friend_data["user_name"]}}:{{chatlog["chatlog"]}}<br><span class="timetext">{{chatlog["timelog"]}}</span></p>
-        {% endif %}
-    {% endfor %}
+    <div id="send_box">
+        <form action="/chatroom" method="post">
+            <input type="hidden" name="recelver_id" value="{{friend_data["user_id"]}}">
+            {% if error == 1 %}
+                <input type="text" name="text" placeholder="250字以内でお願いします">
+            {% else %}
+                <input type="text" name="text" placeholder="相手に送るテキスト">
+            {% endif %}
+            <button type="submit">送信</button>
+        </form>
+    </div>
+</div>
 
-    <form action="/chatroom" method="post">
-        <input type="hidden" name="recelver_id" value="{{friend_data["user_id"]}}">
-        {% if error == 1 %}
-            <input type="text" name="text" placeholder="250字以内でお願いします">
-        {% else %}
-            <input type="text" name="text" placeholder="相手に送るテキスト">
-        {% endif %}
-        <button type="submit">送信</button>
-    </form>
+
+
+
     
 {% endblock %}

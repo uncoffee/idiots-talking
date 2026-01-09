@@ -18,6 +18,10 @@
 
 #closecursor() : コミットをして、cursorとデータベースを閉じる。
 
+#dbリスタート
+"""sudo service mysql restart"""
+
+
 import pymysql  
 import uuid
 
