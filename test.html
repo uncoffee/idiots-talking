@@ -5,183 +5,109 @@ https://qiita.com/sususuAI/items/ad4806c086b02a25d45d　参考にしたサイト
 
 
 
--->>
+-->
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>test</title>
+        <style>
 
-    <style>
-        #your_container{
-            /* 高さや幅など、好きな様に設定
-            bms_messages_containerの方で、縦横いっぱいに広がってくれるので、
-            ここで充てた高さと横幅がそのままスタイルになる仕組み */
-
-            height:600px;/*ここはご自由に*/
-            width: 50%;/*ここはご自由に*/
-        }
-        /* チャットの外側部分① */
-        #bms_messages_container{
-            height: 100%;/*your_containerに対して100%になる */
-            width: 100%;/*your_containerに対して100%になる */
-            background-color: #eee;
-        }
-
-        /* ヘッダー部分② */
-        #bms_chat_header {
-            padding: 6px;/*隙間調整*/
-            font-size: 16px;
-            height: 34px;
-            background: #ddd;
-            border: 1px solid #ccc;
-        }
-        /* ステータスマークとユーザー名 */
-        #bms_chat_user_status {
-            float: left;/* bms_chat_headerに対して左寄せ */
-        }
-        /* ステータスマーク */
-        #bms_status_icon {
-            float: left;/* bms_chat_user_statusに対して左寄せ */
-            line-height: 2em;/*高さ調整*/
-        }
-        /* ユーザー名 */
-        #bms_chat_user_name {
-            float: left;/* bms_chat_user_statusに対して左寄せ */
-            line-height: 2em;/*高さ調整*/
-            padding-left: 7px;
-        }
-
-        /* タイムライン部分③ */
-        #bms_messages {
-            overflow: auto;/* スクロールを効かせつつ、メッセージがタイムラインの外に出ないようにする */
-            height:100%;/*テキストエリアが下に張り付く様にする*/
-            border-right: 1px solid #ddd;
-            border-left: 1px solid #ddd;
-            background-color: #eee;
-            box-shadow: 0px 2px 2px 0px rgba(0,0,0,0.2) inset;/*ヘッダーの下に影を入れる*/
-        }
-            /* メッセージ全般のスタイル */
-        .bms_message {
-                margin: 0px;
-                padding: 0 14px;/*吹き出しがタイムラインの側面にひっつかない様に隙間を開ける*/
-                font-size: 16px;
-                word-wrap: break-word;/* 吹き出し内で自動で改行 */
-                white-space: normal;/*指定widthに合わせて、文字を自動的に改行*/
-            }
-            /* メッセージ１（左側） */
-        .bms_left {
-                float: left;/*吹き出しをbms_messagesに対して左寄せ*/
-                line-height: 1.3em;
-            }
-            /* メッセージ２（右側） */
-        .bms_right {
-                float: right;/*吹き出しをbms_messagesに対して右寄せ*/
-                line-height: 1.3em;
-            }
-            /* 回り込みを解除 */
-        .bms_clear {
-                clear: both; /* 左メッセージと右メッセージの回り込み(float)の効果の干渉を防ぐために必要（これが無いと、自分より下のメッセージにfloatが影響する） */
-
+            * {
+                box-sizing: border-box;
             }
 
-        /* テキストエリア、送信ボタン④ */
-        #bms_send {
-            background-color:#eee;/*タイムラインの色と同じにする*/
-            border-right: 1px solid #ddd;
-            border-left: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            height: 48px;
-            padding: 4px;
-        }
-        #bms_send_message{
-            width: calc(100% - 75px);/*常に送信ボタンの横幅を引いたサイズに動的に計算*/
-            line-height: 16px;
-            height: 48px;
-            padding: 14px 6px 0px 6px;/*文字がテキストエリアの中心になる様に隙間調整*/
-            border: 1px solid #ccc;
-            border-radius: 4px;/*角丸*/
-            text-align: left;/*文字を左寄せ*/
-            box-shadow: 2px 2px 4px 0px rgba(0,0,0,0.2) inset;/*内側に影を入れてテキストエリアらしくした*/
-            box-sizing: border-box;/*paddingとborderの要素の高さと幅の影響をなくす（要素に高さと幅を含める）*/
+            body {
+                width: 1920px;
+                height: 1080px;
+                padding: 1%;
+            }
 
-        }
-        #bms_send_btn {
-            width: 72px;
-            height: 48px;
-            font-size: 16px;
-            line-height: 3em;
-            float: right;/*bms_sendに対して右寄せ*/
-            color: #fff;
-            font-weight: bold;
-            background: #bcbcbc;
-            text-align: center;/*文字をボタン中央に表示*/
-            border: 1px solid #bbb;
-            border-radius: 4px;/*角丸*/
-            box-sizing: border-box;/*paddingとborderの要素の高さと幅の影響をなくす（要素に高さと幅を含める）*/
-        }
-        #bms_send_btn:hover {
-            background: #13178E; /*マウスポインタを当てた時にアクティブな色になる*/
-            cursor: pointer;/*マウスポインタを当てた時に、カーソルが指の形になる*/
-        }
+            #frame {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid;
+                padding: 1%;
+                width: 50%;
+                height: 50%;
+            }
 
-    </style>
-</head>
-<body>
-    <!-- 自分やユーザーの情報 -->
-    <h3 id="me" user_id="1">あなたはユーザー1です</h3>
-    <h3 id="partner" thread_id="1">相手</h3>
-    <div id="users">
-        <button class="user" user_id="2">ユーザー2</button>
-    </div>
-    <br>
-    <div id="your_container">
+            #logtext {
 
-        <!-- チャットの外側部分① -->
-        <div id="bms_messages_container">
-            <!-- ヘッダー部分② -->
-            <div id="bms_chat_header">
-                <!--ステータス-->
-                <div id="bms_chat_user_status">
-                    <!--ステータスアイコン-->
-                    <div id="bms_status_icon">●</div>
-                    <!--ユーザー名-->
-                    <div id="bms_chat_user_name">ユーザー</div>
+                width: 100%;
+                flex: 8;
+                border: 1px solid;
+
+            }
+            
+            #sendbox {
+                display: flex;
+                border: 1px solid;
+                width: 100%;
+                flex: 2;
+            }
+
+            #sendbox input {
+                font-size :25px;
+                min-width: 10ch; 
+            }
+
+            #sendbox button {
+                background-color:red;
+                flex: 2;
+            }
+
+            #sendbox textarea {
+                flex: 8;
+                height: 100%;
+                font-size: 50px;
+                padding: 10px;
+                resize: none;
+            }
+
+        </style>
+
+        <script>
+            const textarea = document.getElementById('#textbox');// 入力されるたびに実行されるイベント
+            textarea.addEventListener('input', () => {
+            // 1. 一度高さを自動（初期値）に戻す（これをしないと縮まなくなる）
+            textarea.style.height = 'auto';
+            // 2. 中身の高さ（scrollHeight）に合わせて高さを設定する
+            textarea.style.height = textarea.scrollHeight + 'px';
+
+            });
+        </script>
+    </head>
+
+    <body>
+        <div id="frame">
+            <div id="logtext">
+                <div id="mytext">
+                    <p>aaaaa</p>
+                </div>
+
+                <div id="hetext">
+                    <p>bbbbb</p>
                 </div>
             </div>
-  
-            <!-- タイムライン部分③ -->
-            <div id="bms_messages">
-  
-                <!--メッセージ１（左側）-->
-                <div class="bms_message bms_left">
-                    <div class="bms_message_box">
-                        <div class="bms_message_content">
-                            <div class="bms_message_text">ほうほうこりゃー便利じゃないか</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bms_clear"></div><!-- 回り込みを解除（スタイルはcssで充てる） -->
 
-                <!--メッセージ２（右側）-->
-                <div class="bms_message bms_right">
-                    <div class="bms_message_box">
-                        <div class="bms_message_content">
-                            <div class="bms_message_text">うん、まあまあいけとるな</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bms_clear"></div><!-- 回り込みを解除（スタイルはcssで充てる） -->
+            <div id="sendbox">
+                <textarea id="textbox"></textarea>
+                <button>submit</button>
             </div>
-  
-            <!-- テキストボックス、送信ボタン④ -->
-            <div id="bms_send">
-                <textarea id="bms_send_message"></textarea>
-                <div id="bms_send_btn">送信</div>
-            </div>
-        </div>
-    </div>
-</body>
+    </body>
+    <textarea id="note" placeholder="ここに入力してください"></textarea>
+<p>文字数: <span id="count">0</span></p>
+
+<script>
+  const textArea = document.querySelector('#textbox');
+  const countDisplay = document.querySelector('#count');
+
+  textArea.addEventListener('input', () => {
+    // 現在の文字数を取得して表示を更新
+    countDisplay.textContent = textArea.value.length;
+  });
+</script>
 </html>
